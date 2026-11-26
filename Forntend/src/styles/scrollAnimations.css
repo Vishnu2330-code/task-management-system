@@ -1,0 +1,1059 @@
+/* ========================================================================== */
+/* NEXT-LEVEL SCROLLING ANIMATION DESIGN SYSTEM (HIGH PERFORMANCE / 120 FPS) */
+/* ========================================================================== */
+
+/* --- 1. Global Smooth Scrolling & Sleek Custom Scrollbars --- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Custom WebKit Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.38);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background 0.16s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.65);
+}
+
+/* Firefox scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.38) transparent;
+}
+
+/* --- 2. Top-Fixed Gradient Glow Scroll Progress Bar (GPU ScaleX) --- */
+.scroll-progress-track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.03);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  opacity: 0;
+}
+
+.scroll-progress-track.is-active {
+  opacity: 1;
+}
+
+.scroll-progress-fill {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+  background: linear-gradient(90deg, #3b82f6, #6366f1, #06b6d4);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.scroll-progress-glow-head {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 0 8px #ffffff,
+    0 0 16px currentColor;
+}
+
+/* Themed Progress Bars */
+.scroll-progress-track.progress-landing .scroll-progress-fill {
+  background: linear-gradient(90deg, #2563eb, #6366f1, #06b6d4);
+  color: #06b6d4;
+}
+
+.scroll-progress-track.progress-admin .scroll-progress-fill,
+.scroll-progress-track.progress-users .scroll-progress-fill {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed, #a855f7);
+  color: #a855f7;
+}
+
+.scroll-progress-track.progress-manager .scroll-progress-fill {
+  background: linear-gradient(90deg, #7c3aed, #9333ea, #ec4899);
+  color: #ec4899;
+}
+
+.scroll-progress-track.progress-member .scroll-progress-fill {
+  background: linear-gradient(90deg, #059669, #10b981, #34d399);
+  color: #34d399;
+}
+
+.scroll-progress-track.progress-projects .scroll-progress-fill {
+  background: linear-gradient(90deg, #0d9488, #14b8a6, #2dd4bf);
+  color: #2dd4bf;
+}
+
+.scroll-progress-track.progress-tasks .scroll-progress-fill {
+  background: linear-gradient(90deg, #d97706, #f59e0b, #fbbf24);
+  color: #fbbf24;
+}
+
+.scroll-progress-track.progress-profile .scroll-progress-fill {
+  background: linear-gradient(90deg, #475569, #64748b, #94a3b8);
+  color: #94a3b8;
+}
+
+/* --- 3. Floating Scroll-To-Top Button with Radial Gauge --- */
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow:
+    0 4px 12px rgba(15, 23, 42, 0.08),
+    0 10px 24px -4px rgba(15, 23, 42, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(0.85);
+  transition:
+    opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0.24s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  backdrop-filter: blur(12px);
+}
+
+.scroll-to-top-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.scroll-to-top-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.14),
+    0 16px 32px -6px rgba(59, 130, 246, 0.25);
+  background: #f8fafc;
+}
+
+.scroll-to-top-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.scroll-progress-ring {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.scroll-ring-bg {
+  fill: none;
+  stroke: rgba(226, 232, 240, 0.6);
+}
+
+.scroll-ring-fill {
+  fill: none;
+  stroke: var(--color-primary, #3b82f6);
+  stroke-linecap: round;
+}
+
+.scroll-arrow-icon {
+  position: relative;
+  z-index: 2;
+  color: var(--color-primary, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.scroll-to-top-btn:hover .scroll-arrow-icon {
+  transform: translateY(-2px);
+}
+
+/* --- 4. Reusable Scroll Reveal Engine (Optimized GPU Memory) --- */
+.scroll-reveal-item {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal-item:not(.is-in-view) {
+  will-change: transform, opacity;
+}
+
+.scroll-reveal-item.is-revealed {
+  will-change: auto !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Fade Up */
+.reveal-fade-up {
+  opacity: 0;
+  transform: translateY(24px) translateZ(0);
+}
+.reveal-fade-up.is-in-view {
+  opacity: 1;
+  transform: translateY(0) translateZ(0);
+}
+
+/* Fade Down */
+.reveal-fade-down {
+  opacity: 0;
+  transform: translateY(-24px) translateZ(0);
+}
+.reveal-fade-down.is-in-view {
+  opacity: 1;
+  transform: translateY(0) translateZ(0);
+}
+
+/* Fade Left */
+.reveal-fade-left {
+  opacity: 0;
+  transform: translateX(-24px) translateZ(0);
+}
+.reveal-fade-left.is-in-view {
+  opacity: 1;
+  transform: translateX(0) translateZ(0);
+}
+
+/* Fade Right */
+.reveal-fade-right {
+  opacity: 0;
+  transform: translateX(24px) translateZ(0);
+}
+.reveal-fade-right.is-in-view {
+  opacity: 1;
+  transform: translateX(0) translateZ(0);
+}
+
+/* Zoom In */
+.reveal-zoom-in {
+  opacity: 0;
+  transform: scale(0.94) translateZ(0);
+}
+.reveal-zoom-in.is-in-view {
+  opacity: 1;
+  transform: scale(1) translateZ(0);
+}
+
+/* 3D Perspective Tilt */
+.reveal-tilt-3d {
+  opacity: 0;
+  transform: perspective(800px) rotateX(6deg) translateY(28px) translateZ(0);
+  transform-origin: center bottom;
+}
+.reveal-tilt-3d.is-in-view {
+  opacity: 1;
+  transform: perspective(800px) rotateX(0deg) translateY(0) translateZ(0);
+}
+
+/* Blur In */
+.reveal-blur-in {
+  opacity: 0;
+  transform: translateY(14px) translateZ(0);
+}
+.reveal-blur-in.is-in-view {
+  opacity: 1;
+  transform: translateY(0) translateZ(0);
+}
+
+/* --- 5. Scroll Horizontal Shadow Container --- */
+.scroll-h-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.scroll-h-content {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-h-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.scroll-h-shadow.shadow-left {
+  left: 0;
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.08), transparent);
+}
+
+.scroll-h-shadow.shadow-right {
+  right: 0;
+  background: linear-gradient(270deg, rgba(15, 23, 42, 0.08), transparent);
+}
+
+.scroll-h-shadow.is-active {
+  opacity: 1;
+}
+
+.scroll-h-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.scroll-h-arrow:hover {
+  background: #f1f5f9;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.scroll-h-arrow.arrow-left {
+  left: 6px;
+}
+
+.scroll-h-arrow.arrow-right {
+  right: 6px;
+}
+
+/* --- 6. Floating Quick-Jump ScrollSpy Navigator --- */
+.scroll-spy-dock {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  overflow-x: auto;
+  padding: 4px 2px;
+}
+
+.scroll-spy-pill-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.03),
+    0 6px 16px -4px rgba(0, 0, 0, 0.05);
+}
+
+.scroll-spy-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #475569);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.scroll-spy-item:hover {
+  color: var(--text-primary, #0f172a);
+  background: rgba(241, 245, 249, 0.7);
+}
+
+.scroll-spy-item.is-active {
+  color: #ffffff;
+  background: var(--color-primary, #3b82f6);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary, #3b82f6) 35%, transparent);
+}
+
+.scroll-spy-item.is-active .scroll-spy-icon {
+  color: #ffffff;
+}
+
+/* --- 7. Landing Page High-Performance Parallax & Scroll UX --- */
+.landing-scroll-experience {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Morphing Sticky Glass Navbar */
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition:
+    background-color 0.25s ease,
+    backdrop-filter 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.landing-nav.is-scrolled {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom-color: rgba(59, 130, 246, 0.15);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 20px -4px rgba(59, 130, 246, 0.05);
+}
+
+/* Optimized Pre-rendered Radial Glow Orbs (NO runtime blur overhead!) */
+.landing-ambient-orbs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  contain: strict;
+  will-change: transform;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  contain: layout style paint;
+}
+
+.orb-primary {
+  width: 440px;
+  height: 440px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.16) 0%, rgba(59, 130, 246, 0.04) 50%, transparent 70%);
+  top: 4%;
+  left: -8%;
+}
+
+.orb-indigo {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, rgba(99, 102, 241, 0.04) 50%, transparent 70%);
+  top: 32%;
+  right: -8%;
+}
+
+.orb-emerald {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.14) 0%, rgba(16, 185, 129, 0.03) 50%, transparent 70%);
+  top: 65%;
+  left: 18%;
+}
+
+/* Interactive Hero Scroll Cue */
+.hero-scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+  cursor: pointer;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+  user-select: none;
+}
+
+.hero-scroll-cue.is-faded {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+
+.cue-text {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #94a3b8);
+}
+
+.cue-mouse {
+  width: 22px;
+  height: 34px;
+  border: 2px solid rgba(148, 163, 184, 0.6);
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.cue-wheel {
+  width: 3px;
+  height: 7px;
+  background: var(--color-primary, #3b82f6);
+  border-radius: 999px;
+  position: absolute;
+  top: 6px;
+  animation: wheelBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes wheelBounce {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  60% {
+    opacity: 0.2;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.cue-arrow-bounce {
+  color: var(--text-muted, #94a3b8);
+  animation: arrowBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes arrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* Live Telemetry Ticker Strip */
+.landing-telemetry-strip {
+  margin: 50px auto 40px auto;
+  max-width: 1200px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.telemetry-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: var(--radius-xl, 20px);
+  padding: 24px;
+  box-shadow:
+    0 10px 30px -5px rgba(0, 0, 0, 0.04),
+    0 4px 10px -2px rgba(0, 0, 0, 0.02);
+}
+
+.telemetry-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px;
+}
+
+.telemetry-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.telemetry-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #0f172a);
+}
+
+.telemetry-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Feature Interactive Card Glow Effect */
+.feature-card-interactive {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  contain: content;
+}
+
+.feature-card-interactive:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 12px 24px -4px rgba(15, 23, 42, 0.08),
+    0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.feature-card-glow-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary, #3b82f6), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.feature-card-interactive:hover .feature-card-glow-line {
+  opacity: 1;
+}
+
+/* --- 8. Sticky Filter Bars and Elevated Headers --- */
+.sticky-table-controls,
+.sticky-filter-bar,
+.sticky-kanban-controls {
+  position: sticky;
+  top: 72px;
+  z-index: 25;
+  background: rgba(248, 250, 252, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 8px 18px -4px rgba(0, 0, 0, 0.04);
+}
+
+.sticky-tabs-bar {
+  position: sticky;
+  top: 72px;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* Sticky Data Table Headers */
+.sticky-header-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f8fafc;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Staggered Row Entrance */
+.table-row-animated {
+  animation: rowFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes rowFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card Interactive Lift */
+.card-interactive-lift {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  contain: content;
+}
+
+.card-interactive-lift:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 10px 25px -4px rgba(0, 0, 0, 0.08),
+    0 4px 10px -2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-elevated {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.04),
+    0 10px 20px -3px rgba(0, 0, 0, 0.06);
+}
+
+/* --- 9. Role Specific Scroll Badges --- */
+.executive-badge-pill,
+.manager-badge-pill,
+.member-badge-pill,
+.projects-badge-pill,
+.tasks-badge-pill,
+.users-badge-pill,
+.profile-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.executive-badge-pill {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.manager-badge-pill {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.member-badge-pill {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.projects-badge-pill {
+  background: rgba(20, 184, 166, 0.1);
+  color: #0d9488;
+}
+
+.tasks-badge-pill {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.users-badge-pill {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+}
+
+.profile-badge-pill {
+  background: rgba(100, 116, 139, 0.1);
+  color: #475569;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+/* --- 10. Sprint Velocity Meter Bars --- */
+.velocity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.velocity-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.velocity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.velocity-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.velocity-pct {
+  font-size: 0.9rem;
+}
+
+.velocity-bar-track {
+  width: 100%;
+  height: 9px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.velocity-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.velocity-bar-fill.fill-emerald {
+  background: linear-gradient(90deg, #10b981, #059669);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.velocity-bar-fill.fill-indigo {
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+}
+
+.velocity-subtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* --- 11. Living Audit Trail Glowing Spine --- */
+.activity-timeline-wrapper {
+  position: relative;
+}
+
+.activity-timeline.living-audit-trail {
+  position: relative;
+}
+
+.timeline-glowing-spine {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 17px;
+  width: 2px;
+  background: linear-gradient(180deg, #3b82f6, #6366f1, #10b981, rgba(226, 232, 240, 0.4));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pulse-on-inview {
+  animation: nodeGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes nodeGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+}
+
+/* --- 12. Coordinated Profile Dual-Column Scroll --- */
+.coordinated-scroll-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.sticky-profile-card {
+  position: sticky;
+  top: 88px;
+  z-index: 15;
+}
+
+.profile-anchor-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
+}
+
+.anchor-link-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid transparent;
+  background: #f8fafc;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  text-align: left;
+}
+
+.anchor-link-btn:hover {
+  background: #f1f5f9;
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  transform: translateX(3px);
+}
+
+@media (max-width: 900px) {
+  .coordinated-scroll-layout {
+    grid-template-columns: 1fr;
+  }
+  .sticky-profile-card {
+    position: static;
+  }
+}
+
+/* --- 13. Auth Ambient Floating Beams & 3D Card --- */
+.auth-scroll-experience {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-ambient-beams {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  contain: strict;
+}
+
+.auth-beam {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  contain: layout style paint;
+}
+
+.beam-1 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%);
+  top: 10%;
+  left: 15%;
+}
+
+.beam-2 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, transparent 70%);
+  bottom: 10%;
+  right: 15%;
+}
+
+.auth-card-3d {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease;
+}
+
+.auth-card-3d:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 36px -4px rgba(15, 23, 42, 0.12),
+    0 8px 16px -2px rgba(15, 23, 42, 0.08);
+}
+
+.section-highlight-pulse {
+  animation: sectionPulse 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-radius: var(--radius-lg, 14px);
+}
+
+@keyframes sectionPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.55);
+  }
+  40% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.18);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* --- 14. Reduced Motion Accessibility Support --- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .scroll-reveal-item,
+  .reveal-fade-up,
+  .reveal-fade-down,
+  .reveal-fade-left,
+  .reveal-fade-right,
+  .reveal-zoom-in,
+  .reveal-tilt-3d,
+  .reveal-blur-in {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+
+  .table-row-animated,
+  .cue-wheel,
+  .cue-arrow-bounce,
+  .live-pulse-dot,
+  .pulse-on-inview {
+    animation: none !important;
+  }
+
+  .velocity-bar-fill {
+    transition: none !important;
+  }
+}
